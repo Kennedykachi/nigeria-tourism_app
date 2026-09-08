@@ -1,95 +1,126 @@
 const express = require('express');
 const cors = require('cors');
 const db = require('./database');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 const PORT = 5000;
+const JWT_SECRET = 'your-secret-key-change-in-production';
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Test route
-app.get('/', (req, res) => {
-  res.json({ message: 'Nigeria Tourism API is running!' });
+// ---------- AUTH ROUTES ----------
+app.post('/api/auth/register', (req, res) => {
+  const { name, email, password } = req.body;
+  if (!name || !email || !password) {
+    return res.status(400).json({ error: 'Please provide name, email and password' });
+  }
+
+  const passwordHash = bcrypt.hashSync(password, 10);
+  db.run(
+    'INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)',
+    [name, email, passwordHash],
+    function(err) {
+      if (err) {
+        if (err.message.includes('UNIQUE constraint failed')) {
+          return res.status(409).json({ error: 'Email already registered' });
+        }
+        return res.status(500).json({ error: err.message });
+      }
+      res.status(201).json({ message: 'User registered successfully', userId: this.lastID });
+    }
+  );
 });
 
-// Get all tourist sites
+app.post('/api/auth/login', (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Please provide email and password' });
+  }
+
+  db.get('SELECT * FROM users WHERE email = ?', [email], (err, user) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (!user) return res.status(401).json({ error: 'Invalid credentials' });
+
+    const passwordValid = bcrypt.compareSync(password, user.password_hash);
+    if (!passwordValid) return res.status(401).json({ error: 'Invalid credentials' });
+
+    const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: '24h' });
+    res.json({ token, user: { id: user.id, name: user.name, email: user.email } });
+  });
+});
+
+// ---------- TOURIST SITES ROUTES ----------
 app.get('/api/tourist-sites', (req, res) => {
-  db.all('SELECT * FROM tourist_sites', [], (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
+  const { state, category, search } = req.query;
+  let query = 'SELECT * FROM tourist_sites WHERE 1=1';
+  const params = [];
+
+  if (state) {
+    query += ' AND state = ?';
+    params.push(state);
+  }
+  if (category) {
+    query += ' AND category = ?';
+    params.push(category);
+  }
+  if (search) {
+    query += ' AND (name LIKE ? OR description LIKE ?)';
+    params.push(`%${search}%`, `%${search}%`);
+  }
+
+  db.all(query, params, (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
     res.json(rows);
   });
 });
 
-// Get single tourist site
+app.get('/api/states', (req, res) => {
+  db.all('SELECT DISTINCT state FROM tourist_sites ORDER BY state', [], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows.map(r => r.state));
+  });
+});
+
+app.get('/api/categories', (req, res) => {
+  db.all('SELECT DISTINCT category FROM tourist_sites ORDER BY category', [], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows.map(r => r.category));
+  });
+});
+
 app.get('/api/tourist-sites/:id', (req, res) => {
   const { id } = req.params;
   db.get('SELECT * FROM tourist_sites WHERE id = ?', [id], (err, row) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    if (!row) {
-      res.status(404).json({ error: 'Site not found' });
-      return;
-    }
+    if (err) return res.status(500).json({ error: err.message });
+    if (!row) return res.status(404).json({ error: 'Site not found' });
     res.json(row);
   });
 });
 
-// Get tour guides for a site
 app.get('/api/tourist-sites/:id/guides', (req, res) => {
-  const { id } = req.params;
-  db.all(
-    'SELECT * FROM tour_guides WHERE site_id = ?',
-    [id],
-    (err, rows) => {
-      if (err) {
-        res.status(500).json({ error: err.message });
-        return;
-      }
-      res.json(rows);
-    }
-  );
+  db.all('SELECT * FROM tour_guides WHERE site_id = ?', [req.params.id], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows);
+  });
 });
 
-// Get hotels near a site
 app.get('/api/tourist-sites/:id/hotels', (req, res) => {
-  const { id } = req.params;
-  db.all(
-    'SELECT * FROM hotels WHERE site_id = ? ORDER BY distance_km ASC',
-    [id],
-    (err, rows) => {
-      if (err) {
-        res.status(500).json({ error: err.message });
-        return;
-      }
-      res.json(rows);
-    }
-  );
+  db.all('SELECT * FROM hotels WHERE site_id = ? ORDER BY distance_km ASC', [req.params.id], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows);
+  });
 });
 
-// Get restaurants near a site
 app.get('/api/tourist-sites/:id/restaurants', (req, res) => {
-  const { id } = req.params;
-  db.all(
-    'SELECT * FROM restaurants WHERE site_id = ? ORDER BY distance_km ASC',
-    [id],
-    (err, rows) => {
-      if (err) {
-        res.status(500).json({ error: err.message });
-        return;
-      }
-      res.json(rows);
-    }
-  );
+  db.all('SELECT * FROM restaurants WHERE site_id = ? ORDER BY distance_km ASC', [req.params.id], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows);
+  });
 });
 
-// Start server
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
