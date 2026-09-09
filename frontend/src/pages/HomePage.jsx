@@ -10,6 +10,7 @@ function HomePage() {
   const [error, setError] = useState('');
   const [category, setCategory] = useState('');
   const [state, setState] = useState('');
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     const fetchSites = async () => {
@@ -18,6 +19,7 @@ function HomePage() {
         const params = {};
         if (category) params.category = category;
         if (state) params.state = state;
+        if (search) params.search = search;
         const response = await api.get('/tourist-sites', { params });
         setSites(response.data);
         setError('');
@@ -28,11 +30,22 @@ function HomePage() {
       }
     };
     fetchSites();
-  }, [category, state]);
+  }, [category, state, search]);
 
   return (
     <div>
       <h1 className="text-3xl font-bold text-teal-800 mb-4">Discover Nigeria</h1>
+
+      {/* Search Bar */}
+      <div className="mb-6">
+        <input
+          type="text"
+          placeholder="Search by site name or description..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full md:w-1/2 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+        />
+      </div>
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <CategoryFilter selected={category} onSelect={setCategory} />
