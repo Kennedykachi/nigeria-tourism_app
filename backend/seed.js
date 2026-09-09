@@ -25,7 +25,7 @@ db.serialize(() => {
       entry_fee: 1000,
       distance_from_city_center_km: 2.5,
       transportation_options: 'Taxi, Keke Napep, Motorcycle (Okada)',
-      map_url: 'https://goo.gl/maps/example1',
+      map_url: 'https://www.google.com/maps/search/?api=1&query=Olumo+Rock+Abeokuta',
       best_time_to_visit: 'November to March'
     },
     {
@@ -41,7 +41,7 @@ db.serialize(() => {
       entry_fee: 2000,
       distance_from_city_center_km: 110,
       transportation_options: 'Private car, tour bus, motorbike',
-      map_url: 'https://goo.gl/maps/example2',
+      map_url: 'https://www.google.com/maps/search/?api=1&query=Yankari+National+Park+Bauchi',
       best_time_to_visit: 'December to April'
     },
     {
@@ -57,7 +57,7 @@ db.serialize(() => {
       entry_fee: 3000,
       distance_from_city_center_km: 75,
       transportation_options: 'Private car, taxi from Obudu town',
-      map_url: 'https://goo.gl/maps/example3',
+      map_url: 'https://www.google.com/maps/search/?api=1&query=Obudu+Mountain+Resort+Obudu',
       best_time_to_visit: 'October to February'
     },
     {
@@ -73,7 +73,7 @@ db.serialize(() => {
       entry_fee: 1500,
       distance_from_city_center_km: 30,
       transportation_options: 'Uber, Bolt, taxi, Keke Napep',
-      map_url: 'https://goo.gl/maps/example4',
+      map_url: 'https://www.google.com/maps/search/?api=1&query=Lekki+Conservation+Centre+Lekki',
       best_time_to_visit: 'November to February'
     },
     {
@@ -89,7 +89,7 @@ db.serialize(() => {
       entry_fee: 500,
       distance_from_city_center_km: 20,
       transportation_options: 'Taxi, bus from Abuja',
-      map_url: 'https://goo.gl/maps/example5',
+      map_url: 'https://www.google.com/maps/search/?api=1&query=Zuma+Rock+Suleja',
       best_time_to_visit: 'Year round'
     },
     {
@@ -105,7 +105,7 @@ db.serialize(() => {
       entry_fee: 0,
       distance_from_city_center_km: 5,
       transportation_options: 'Uber, Bolt, taxi, walking',
-      map_url: 'https://goo.gl/maps/example6',
+      map_url: 'https://www.google.com/maps/search/?api=1&query=Bar+Beach+Victoria+Island',
       best_time_to_visit: 'November to March'
     },
     {
@@ -121,7 +121,7 @@ db.serialize(() => {
       entry_fee: 500,
       distance_from_city_center_km: 15,
       transportation_options: 'Taxi, bus, motorbike',
-      map_url: 'https://goo.gl/maps/example7',
+      map_url: 'https://www.google.com/maps/search/?api=1&query=Erin+Ijesha+Waterfall+Ilesa',
       best_time_to_visit: 'May to October'
     },
     {
@@ -137,7 +137,7 @@ db.serialize(() => {
       entry_fee: 1000,
       distance_from_city_center_km: 10,
       transportation_options: 'Taxi, minibus',
-      map_url: 'https://goo.gl/maps/example8',
+      map_url: 'https://www.google.com/maps/search/?api=1&query=Ogbunike+Caves+Ogbunike',
       best_time_to_visit: 'November to April'
     },
     {
@@ -153,7 +153,7 @@ db.serialize(() => {
       entry_fee: 300,
       distance_from_city_center_km: 12,
       transportation_options: 'Taxi, motorbike',
-      map_url: 'https://goo.gl/maps/example9',
+      map_url: 'https://www.google.com/maps/search/?api=1&query=Ngwo+Pine+Forest+Ngwo',
       best_time_to_visit: 'Year round'
     },
     {
@@ -169,7 +169,7 @@ db.serialize(() => {
       entry_fee: 0,
       distance_from_city_center_km: 8,
       transportation_options: 'Boat from Tarzan Jetty',
-      map_url: 'https://goo.gl/maps/example10',
+      map_url: 'https://www.google.com/maps/search/?api=1&query=Tarkwa+Bay+Beach+Lagos',
       best_time_to_visit: 'November to March'
     }
   ];
